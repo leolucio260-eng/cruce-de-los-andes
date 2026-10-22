@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El Cruce de los Andes 1817</title>
+<style>
+  :root {
+    --papel: #f3ead7;
+    --panel: #fbf6ea;
+    --tinta: #2b2118;
+    --tinta-suave: #6b5a48;
+    --borde: #d6c6a5;
+    --azul: #1f4e79;
+    --azul-claro: #6fa8dc;
+    --rojo: #a0302a;
+    --verde: #3d7a3a;
+    --oro: #b8860b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--papel);
+    color: var(--tinta);
+    font-family: "Segoe UI", system-ui, -apple-system, Ubuntu, Arial, sans-serif;
+    font-size: 16px;
+  }
+  h1, h2, h3, .serif { font-family: Georgia, "Times New Roman", serif; }
+  button {
+    font: inherit;
+    cursor: pointer;
+    border: 2px solid var(--azul);
+    background: var(--azul);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    transition: transform .08s, background .15s;
+  }
+  button:hover:not(:disabled) { background: #163a5b; }
+  button:active:not(:disabled) { transform: translateY(1px); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button.sec { background: transparent; color: var(--azul); }
+  button.sec:hover:not(:disabled) { background: #e6eef6; }
+
+  .pantalla { display: none; min-height: 100vh; }
+  .pantalla.activa { display: block; }
+
+  /* ---------- Inicio ---------- */
+  #inicio {
+    background: linear-gradient(#2c4a6e, #7d9cbf 55%, #e9dcc0);
+  }
+  #inicio .tarjeta {
+    max-width: 780px; margin: 0 auto; padding: 40px 16px;
+  }
+  #inicio h1 {
+    color: #fff; font-size: clamp(2rem, 6vw, 3.4rem); margin: 0 0 4px;
+    text-shadow: 0 2px 8px rgba(0,0,0,.4); text-align: center;
+  }
+  #inicio .sub { color: #e8eef6; text-align: center; margin: 0 0 24px; font-size: 1.1rem; }
+  .caja {
+    background: var(--panel); border: 1px solid var(--borde); border-radius: 10px;
+    padding: 18px 22px; margin-bottom: 16px; line-height: 1.55;
+    box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  }
+  .caja h2 { margin-top: 0; font-size: 1.3rem; color: var(--azul); }
+  .caja ul { padding-left: 20px; margin: 6px 0; }
+  .centro { text-align: center; }
+  .btn-grande { font-size: 1.2rem; padding: 14px 34px; }
+
+  /* ---------- Juego ---------- */
+  #juego header {
+    display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; justify-content: space-between;
+    padding: 10px 16px; background: var(--azul); color: #fff;
+  }
+  #juego header h1 { margin: 0; font-size: 1.3rem; }
+  #juego header .fecha { font-family: Georgia, serif; font-size: 1.05rem; }
+  .contenedor {
+    display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 14px;
+    padding: 14px 16px; max-width: 1300px; margin: 0 auto;
+  }
+  @media (max-width: 900px) { .contenedor { grid-template-columns: minmax(0, 1fr); } }
+  #escena {
+    width: 100%; height: 300px; display: block; border-radius: 10px;
+    border: 1px solid var(--borde); background: #8fb3d9;
+  }
+  .lugar {
+    font-family: Georgia, serif; margin: 8px 2px 4px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px;
+  }
+  .lugar b { color: var(--azul); }
+  #perfil { width: 100%; height: auto; display: block; }
+  .nota { font-size: .8rem; color: var(--tinta-suave); }
+
+  .recurso { margin-bottom: 10px; }
+  .recurso .fila { display: flex; justify-content: space-between; font-size: .95rem; margin-bottom: 3px; }
+  .recurso .fila span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .barra { height: 10px; background: #e5dbc6; border-radius: 5px; overflow: hidden; }
+  .barra > div { height: 100%; width: 0; border-radius: 5px; transition: width .6s, background .3s; }
+
+  .grupo { margin: 12px 0; }
+  .grupo .titulo { font-weight: 600; margin-bottom: 6px; font-size: .95rem; }
+  .opciones { display: flex; gap: 6px; flex-wrap: wrap; }
+  .opciones label {
+    flex: 1 1 0; min-width: 90px; text-align: center; padding: 8px 6px; border: 2px solid var(--borde);
+    border-radius: 6px; cursor: pointer; background: #fff; font-size: .9rem; line-height: 1.25;
+  }
+  .opciones label small { display: block; color: var(--tinta-suave); font-size: .75rem; }
+  .opciones input { display: none; }
+  .opciones input:checked + label { border-color: var(--azul); background: #e6eef6; }
+  #btnAvanzar { width: 100%; font-size: 1.1rem; padding: 12px; margin-top: 6px; }
+
+  #diario {
+    max-height: 210px; overflow-y: auto; font-family: Georgia, serif; font-size: .95rem; line-height: 1.45;
+  }
+  #diario p { margin: 0 0 6px; padding-bottom: 6px; border-bottom: 1px dashed var(--borde); }
+  #diario p b { color: var(--azul); }
+
+  .lasheras { font-size: .9rem; margin-top: 10px; }
+
+  /* ---------- Modal ---------- */
+  #modal {
+    position: fixed; inset: 0; background: rgba(20,15,10,.6); display: none;
+    align-items: center; justify-content: center; padding: 16px; z-index: 10;
+  }
+  #modal.abierto { display: flex; }
+  #modal .tarjeta {
+    background: var(--panel); max-width: 620px; width: 100%; border-radius: 12px; padding: 22px 24px;
+    border: 3px double var(--borde); max-height: 92vh; overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,.4); animation: entrar .25s ease-out;
+  }
+  @keyframes entrar { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+  #modal h2 { margin: 0 0 10px; color: var(--azul); }
+  #modal .texto { line-height: 1.55; }
+  #modal .botones { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  #modal .botones button { text-align: left; }
+  .dato {
+    margin-top: 14px; padding: 12px 14px; background: #fff7df; border-left: 4px solid var(--oro);
+    border-radius: 4px; font-size: .93rem; line-height: 1.5;
+  }
+  .dato b { color: var(--oro); }
+  .cambios { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip { padding: 3px 10px; border-radius: 12px; font-size: .85rem; font-weight: 600; }
+  .chip.mas { background: #dcefd9; color: var(--verde); }
+  .chip.menos { background: #f6dcd9; color: var(--rojo); }
+  .chip.neutro { background: #e6eef6; color: var(--azul); }
+
+  /* ---------- Batalla / Final / Quiz ---------- */
+  .pagina { max-width: 820px; margin: 0 auto; padding: 30px 16px; }
+  .pagina h1 { color: var(--azul); text-align: center; margin-top: 0; }
+  .fuerzas { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+  .fuerzas .lado { text-align: center; }
+  .fuerzas .num { font-size: 2rem; font-weight: 700; font-family: Georgia, serif; }
+  .pat .num { color: var(--azul); }
+  .rea .num { color: var(--rojo); }
+  .choque { height: 26px; display: flex; border-radius: 13px; overflow: hidden; border: 1px solid var(--borde); }
+  .choque div { transition: width 1.6s ease-in-out; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 16px 0; }
+  .stat { background: #fff; border: 1px solid var(--borde); border-radius: 8px; padding: 10px; text-align: center; }
+  .stat .v { font-size: 1.5rem; font-weight: 700; font-family: Georgia, serif; color: var(--azul); }
+  .stat .k { font-size: .82rem; color: var(--tinta-suave); }
+  .rango { font-size: 1.6rem; text-align: center; font-family: Georgia, serif; color: var(--oro); margin: 10px 0; }
+  .quiz-op { display: block; width: 100%; text-align: left; margin: 8px 0; background: #fff; color: var(--tinta); border-color: var(--borde); }
+  .quiz-op:hover:not(:disabled) { background: #e6eef6; }
+  .quiz-op.ok { background: #dcefd9 !important; border-color: var(--verde); }
+  .quiz-op.mal { background: #f6dcd9 !important; border-color: var(--rojo); }
+  .progreso-quiz { color: var(--tinta-suave); text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- ===================== INICIO ===================== -->
+<section id="inicio" class="pantalla activa">
+  <div class="tarjeta">
+    <h1>El Cruce de los Andes</h1>
+    <p class="sub serif">Enero de 1817 · La ruta hacia Chacabuco</p>
+
+    <div class="caja">
+      <h2>Contexto histórico</h2>
+      <p>Tras el <b>Desastre de Rancagua (1814)</b>, Chile volvió a manos de la Corona española. Fue el período de la
+      <b>Reconquista</b>, con el gobernador <b>Casimiro Marcó del Pont</b>. Muchos patriotas chilenos, entre ellos
+      <b>Bernardo O'Higgins</b>, se exiliaron en Mendoza. Allí el general <b>José de San Martín</b> formó el
+      <b>Ejército de los Andes</b>, que se entrenó en el campamento de <b>El Plumerillo</b>.</p>
+      <p>Su plan era cruzar la cordillera más alta de América con miles de hombres y mulas, y sorprender a los realistas en Chile.</p>
+    </div>
+
+    <div class="caja">
+      <h2>Cómo jugar</h2>
+      <ul>
+        <li>Diriges la <b>columna principal</b>, que cruza por el <b>Paso de Los Patos</b>.</li>
+        <li>Cada día eliges el <b>ritmo de marcha</b> y las <b>raciones</b>, y luego presionas <b>Avanzar</b> (o la tecla <b>Espacio</b>).</li>
+        <li>Cuida a tus <b>soldados</b>, <b>mulas</b>, <b>víveres</b> y la <b>moral</b> de la tropa.</li>
+        <li>En el camino aparecerán eventos. Tus decisiones cambian la historia.</li>
+        <li>Llega a Chile antes del <b>11 de febrero</b> para enfrentar a los realistas en <b>Chacabuco</b>.</li>
+        <li>Al final viene un <b>desafío de preguntas</b> sobre lo que aprendiste.</li>
+      </ul>
+    </div>
+
+    <p class="centro"><button class="btn-grande" id="btnEmpezar">Comenzar la marcha</button></p>
+  </div>
+</section>
+
+<!-- ===================== JUEGO ===================== -->
+<section id="juego" class="pantalla">
+  <header>
+    <h1>El Cruce de los Andes</h1>
+    <div class="fecha" id="hFecha"></div>
+    <div id="hDia"></div>
+  </header>
+
+  <div class="contenedor">
+    <div>
+      <canvas id="escena"></canvas>
+      <div class="lugar">
+        <span>Lugar: <b id="hLugar"></b></span>
+        <span>Altitud: <b id="hAlt"></b> · Recorrido: <b id="hKm"></b></span>
+      </div>
+      <svg id="perfil" viewBox="0 0 1000 150" preserveAspectRatio="none"></svg>
+      <div class="nota">Distancias y altitudes aproximadas, simplificadas para el juego.</div>
+
+      <div class="caja" style="margin-top:12px">
+        <h2 style="font-size:1.1rem;margin-bottom:8px">Diario de campaña</h2>
+        <div id="diario"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="caja">
+        <h2 style="font-size:1.1rem">Estado del ejército</h2>
+        <div id="recursos"></div>
+        <div class="lasheras" id="lasHeras"></div>
+      </div>
+
+      <div class="caja">
+        <h2 style="font-size:1.1rem;margin-bottom:4px">Órdenes del día</h2>
+        <div class="grupo">
+          <div class="titulo">Ritmo de marcha</div>
+          <div class="opciones">
+            <input type="radio" name="ritmo" id="r1" value="pausado"><label for="r1">Pausado<small>+moral, lento</small></label>
+            <input type="radio" name="ritmo" id="r2" value="normal" checked><label for="r2">Normal<small>equilibrado</small></label>
+            <input type="radio" name="ritmo" id="r3" value="forzado"><label for="r3">Forzado<small>rápido, agota</small></label>
+          </div>
+        </div>
+        <div class="grupo">
+          <div class="titulo">Raciones</div>
+          <div class="opciones">
+            <input type="radio" name="raciones" id="c1" value="completas" checked><label for="c1">Completas<small>gasta más</small></label>
+            <input type="radio" name="raciones" id="c2" value="reducidas"><label for="c2">Reducidas<small>−moral</small></label>
+          </div>
+        </div>
+        <button id="btnAvanzar">Avanzar ▸</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BATALLA ===================== -->
+<section id="batalla" class="pantalla">
+  <div class="pagina" id="batallaCont"></div>
+</section>
+
+<!-- ===================== FINAL ===================== -->
+<section id="final" class="pantalla">
+  <div class="pagina" id="finalCont"></div>
+</section>
+
+<!-- ===================== QUIZ ===================== -->
+<section id="quiz" class="pantalla">
+  <div class="pagina" id="quizCont"></div>
+</section>
+
+<div id="modal"><div class="tarjeta" id="modalCont"></div></div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   Utilidades
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const rand = (a, b) => a + Math.random() * (b - a);
+const rnd = (a, b) => Math.round(rand(a, b));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const fmt = n => Math.round(n).toLocaleString("es-CL");
+const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+function mostrarPantalla(id) {
+  document.querySelectorAll(".pantalla").forEach(p => p.classList.remove("activa"));
+  $("#" + id).classList.add("activa");
+  window.scrollTo(0, 0);
+}
+
+// Día 1 = 19 de enero de 1817
+function fecha(dia) {
+  const d = new Date(1817, 0, 18 + dia);
+  return d.getDate() + " de " + MESES[d.getMonth()] + " de 1817";
+}
+
+/* ============================================================
+   Ruta (Paso de Los Patos, simplificada)
+   ============================================================ */
+const TOTAL_KM = 300;
+const RUTA = [
+  { km: 0,   alt: 800,  nombre: "Campamento de El Plumerillo (Mendoza)" },
+  { km: 50,  alt: 1900, nombre: "Precordillera",
+    info: "La columna deja atrás los llanos de Cuyo y entra en la precordillera. El ejército avanza dividido en grupos que salen con un día de diferencia, para no amontonarse en los senderos." },
+  { km: 105, alt: 2900, nombre: "Quebradas altas",
+    info: "Los senderos se estrechan. En muchos tramos solo cabe una mula a la vez, con precipicios a un lado. Los <b>arrieros</b> y <b>baqueanos</b> que conocen la montaña son indispensables." },
+  { km: 150, alt: 3300, nombre: "Valle de Los Patos",
+    info: "El ejército cruza el Valle de Los Patos. Por esta ruta, la más larga y difícil, avanzaba el grueso del ejército con <b>San Martín</b>, <b>O'Higgins</b> y <b>Miguel Estanislao Soler</b>." },
+  { km: 195, alt: 4600, nombre: "Cumbre de la cordillera",
+    info: "¡Han alcanzado la parte más alta del cruce, a más de 4.000 metros de altura! Desde aquí, el camino comienza a bajar hacia Chile. El frío, el viento y la falta de oxígeno ponen a prueba a todos." },
+  { km: 240, alt: 3000, nombre: "Achupallas" },
+  { km: 275, alt: 1000, nombre: "Valle de Putaendo",
+    info: "La columna baja al valle de Putaendo, ya en territorio chileno. Después de semanas entre rocas y nieve, los soldados ven otra vez campos verdes." },
+  { km: 300, alt: 650,  nombre: "Valle del Aconcagua (San Felipe)" }
+];
+
+function altitudEn(km) {
+  for (let i = 0; i < RUTA.length - 1; i++) {
+    const a = RUTA[i], b = RUTA[i + 1];
+    if (km <= b.km) return a.alt + (b.alt - a.alt) * ((km - a.km) / (b.km - a.km));
+  }
+  return RUTA[RUTA.length - 1].alt;
+}
+function lugarEn(km) {
+  let l = RUTA[0];
+  for (const p of RUTA) if (km >= p.km) l = p;
+  const sig = RUTA.find(p => p.km > km);
+  if (l.km === km || !sig) return l.nombre;
+  return "Entre " + l.nombre.replace(/ \(.*\)/, "") + " y " + sig.nombre.replace(/ \(.*\)/, "");
+}
+
+/* ============================================================
+   Estado
+   ============================================================ */
+const INI = { soldados: 3000, mulas: 6000, viveres: 22, moral: 75 };
+let E;
+
+function nuevoEstado() {
+  return {
+    dia: 1, km: 0,
+    soldados: INI.soldados, mulas: INI.mulas, viveres: INI.viveres, moral: INI.moral,
+    lasHeras: 0,
+    vistos: new Set(), hitos: new Set(), ultimo: null, veces: {},
+    bonos: { zapa: 0, intel: 0, alerta: 0, achupallas: 0, coimas: 0 },
+    diaLlegada: null,
+    fin: false
+  };
+}
+
+function consumoDiario() { return $("input[name=raciones]:checked").value === "completas" ? 1 : 0.6; }
+
+function aplicarCambios(c) {
+  const chips = [];
+  const nombres = { soldados: "soldados", mulas: "mulas", viveres: "días de víveres", moral: "moral", km: "km" };
+  for (const k in c) {
+    if (!c[k]) continue;
+    if (k === "km") E.km = clamp(E.km + c[k], 0, TOTAL_KM);
+    else if (k === "moral") E.moral = clamp(E.moral + c[k], 0, 100);
+    else E[k] = Math.max(0, E[k] + c[k]);
+    const v = k === "viveres" ? (Math.round(Math.abs(c[k]) * 10) / 10).toLocaleString("es-CL") : fmt(Math.abs(c[k]));
+    chips.push(`<span class="chip ${c[k] > 0 ? "mas" : "menos"}">${c[k] > 0 ? "+" : "−"}${v} ${nombres[k]}</span>`);
+  }
+  return chips;
+}
+
+function perderDias(n) {
+  const chips = [];
+  for (let i = 0; i < n; i++) {
+    E.dia++;
+    E.viveres = Math.max(0, E.viveres - consumoDiario());
+    E.lasHeras = clamp(E.lasHeras + rand(4.5, 6), 0, 100);
+  }
+  if (n > 0) chips.push(`<span class="chip neutro">+${n} día${n > 1 ? "s" : ""}</span>`);
+  return chips;
+}
+
+/* ============================================================
+   Eventos
+   ============================================================ */
+// Cada opción devuelve { texto, c: {cambios}, dias, bono }
+const EVENTOS = [
+  {
+    id: "soroche", titulo: "El soroche",
+    cond: (E, alt) => alt > 2700,
+    texto: "Muchos soldados sufren de <b>soroche</b> (o puna): dolor de cabeza, mareos y falta de aire. Algunos no pueden seguir caminando.",
+    opciones: [
+      { t: "Repartir ajo y cebolla entre la tropa", r: () => ({ texto: "Los soldados mastican ajo y cebolla. Muchos dicen sentirse mejor y la marcha continúa.", c: { viveres: -0.5, soldados: -rnd(5, 15), moral: 3 } }) },
+      { t: "Descansar un día para que se aclimaten", r: () => ({ texto: "El descanso ayuda: la mayoría se recupera, aunque se pierde un día valioso.", c: { soldados: -rnd(0, 6), moral: 5 }, dias: 1 }) },
+      { t: "Seguir adelante sin detenerse", r: () => ({ texto: "Varios hombres se desploman en el camino. Hay que dejarlos atrás con algunos cuidadores.", c: { soldados: -rnd(40, 90), moral: -8 } }) }
+    ],
+    dato: "El <b>soroche</b> es el mal de altura, causado por la falta de oxígeno. Según los relatos de la época, el ejército llevaba <b>ajo y cebolla</b>, porque se creía que aliviaban sus síntomas."
+  },
+  {
+    id: "viento", titulo: "¡Viento blanco!",
+    cond: (E, alt) => alt > 3200,
+    texto: "Una tormenta de nieve y viento helado, el temido <b>viento blanco</b>, cae sobre la columna. Casi no se ve a dos pasos.",
+    opciones: [
+      { t: "Refugiarse tras las rocas y esperar", r: () => ({ texto: "La tropa se acurruca entre las rocas hasta que pasa la tormenta. Algunas mulas no resisten el frío.", c: { mulas: -rnd(30, 80) }, dias: 1 }) },
+      { t: "Avanzar contra la tormenta", r: () => ({ texto: "Avanzan a ciegas. Hombres y animales caen en los barrancos, aunque se gana algo de terreno.", c: { soldados: -rnd(30, 70), mulas: -rnd(150, 300), moral: -10, km: 4 } }) }
+    ],
+    dato: "En la alta cordillera la temperatura cambia muchísimo: de día el sol quema y de noche baja de cero. La mayoría de los soldados nunca había vivido un frío así."
+  },
+  {
+    id: "desfiladero", titulo: "Desfiladero peligroso",
+    cond: (E, alt) => alt > 1800 && E.km < 265,
+    texto: "El sendero se angosta al borde de un precipicio. Las mulas cargadas resbalan sobre las piedras sueltas.",
+    opciones: [
+      { t: "Avanzar en fila, mula por mula, con cuidado", r: () => ({ texto: "El paso es lento, pero casi todos los animales cruzan sanos y salvos.", c: { mulas: -rnd(10, 30), km: -4 } }) },
+      { t: "Mantener el ritmo de marcha", r: () => ({ texto: "Decenas de mulas se despeñan con su carga. Los víveres que llevaban se pierden para siempre.", c: { mulas: -rnd(150, 350), viveres: -1.5 } }) }
+    ],
+    dato: "El ejército salió de Mendoza con <b>más de 9.000 mulas</b> y unos 1.600 caballos. A Chile llegaron <b>menos de la mitad</b> de las mulas y apenas unos 500 caballos."
+  },
+  {
+    id: "zapa", titulo: "Mensaje de Manuel Rodríguez",
+    cond: (E) => E.km > 30 && E.km < 230,
+    texto: "Un mensajero llega en secreto desde Chile. Trae noticias del guerrillero <b>Manuel Rodríguez</b>: el gobernador Marcó del Pont no sabe por dónde llegará el ejército.",
+    opciones: [
+      { t: "Pedirle que siga esparciendo rumores falsos", r: () => ({ texto: "Rodríguez hará creer a los realistas que el ataque vendrá por el sur. ¡Sus tropas seguirán repartidas por todo Chile!", c: { moral: 5 }, bono: "zapa" }) },
+      { t: "Pedirle información sobre las tropas enemigas", r: () => ({ texto: "Sus espías averiguarán cuántos soldados realistas hay y dónde están. Esa información será clave en la batalla.", c: { moral: 3 }, bono: "intel" }) }
+    ],
+    dato: "San Martín organizó la <b>guerra de zapa</b>: espionaje, rumores falsos y guerrillas dentro de Chile. <b>Manuel Rodríguez</b> fue su gran protagonista. Gracias a eso, <b>Marcó del Pont</b> dispersó sus fuerzas sin saber por dónde vendría el ataque."
+  },
+  {
+    id: "condarco", titulo: "Los mapas de Álvarez Condarco",
+    cond: (E) => E.km > 15 && E.km < 170,
+    texto: "El ingeniero <b>José Antonio Álvarez Condarco</b> asegura que conoce un atajo por esta quebrada. Viajó por esta ruta hace unos meses.",
+    opciones: [
+      { t: "Confiar en la memoria de Álvarez Condarco", r: () => ({ texto: "¡Su memoria es asombrosa! El atajo ahorra varias horas de marcha.", c: { km: 10, moral: 2 } }) },
+      { t: "Enviar exploradores a revisar primero", r: () => ({ texto: "Los exploradores confirman el camino. Se avanza algo, aunque más lento.", c: { km: 4 } }) }
+    ],
+    dato: "San Martín envió a <b>Álvarez Condarco</b> a Chile con la noticia de la independencia argentina. Marcó del Pont lo expulsó, pero el ingeniero aprovechó el viaje de ida (por Los Patos) y el de vuelta (por Uspallata) para <b>memorizar ambos caminos</b> y luego dibujó los mapas del cruce."
+  },
+  {
+    id: "sanmartin", titulo: "San Martín enfermo",
+    cond: (E) => E.km > 70 && E.km < 260,
+    texto: "El general <b>San Martín</b> sufre fuertes dolores de estómago y casi no puede montar su mula.",
+    opciones: [
+      { t: "Continuar llevándolo en camilla", r: () => ({ texto: "Ver a su general seguir adelante, incluso enfermo, llena de valor a la tropa.", c: { moral: 6 } }) },
+      { t: "Detener la marcha un día para que descanse", r: () => ({ texto: "San Martín se recupera un poco, pero se pierde un día.", c: { moral: 2 }, dias: 1 }) }
+    ],
+    dato: "Según varios relatos, San Martín tenía problemas de salud durante la campaña y en algunos tramos del cruce lo <b>llevaron en camilla</b>."
+  },
+  {
+    id: "helada", titulo: "Noche helada",
+    cond: (E, alt) => alt > 2500,
+    texto: "Cae la noche y la temperatura baja muy por debajo de cero. En la montaña casi no hay leña.",
+    opciones: [
+      { t: "Buscar arbustos y bosta seca para hacer fogatas", r: () => ({ texto: "Las fogatas salvan a muchos del congelamiento, aunque buscar combustible retrasa la salida.", c: { km: -3, moral: 3, soldados: -rnd(0, 8) } }) },
+      { t: "Dormir todos juntos para guardar calor", r: () => ({ texto: "La noche es terrible. Al amanecer, algunos soldados no despiertan.", c: { soldados: -rnd(15, 40), moral: -5 } }) }
+    ],
+    dato: "Los soldados se abrigaban con <b>ponchos y frazadas</b>. Aun así, muchos sufrieron congelamiento en las noches de la alta cordillera."
+  },
+  {
+    id: "baqueanos", titulo: "Baqueanos de la montaña",
+    cond: (E) => E.km < 190,
+    texto: "Un grupo de <b>baqueanos</b>, guías que conocen cada rincón de la cordillera, ofrece guiar a la vanguardia a cambio de provisiones.",
+    opciones: [
+      { t: "Contratarlos a cambio de víveres", r: () => ({ texto: "Los baqueanos encuentran los mejores pasos. La columna avanza con seguridad.", c: { viveres: -1, km: 8 } }) },
+      { t: "Confiar en nuestros propios mapas", r: () => Math.random() < 0.5
+        ? { texto: "Los mapas son buenos y no hay problemas. ¡Bien hecho!", c: { moral: 2 } }
+        : { texto: "La vanguardia se pierde en una quebrada sin salida y hay que volver atrás.", c: { moral: -4 }, dias: 1 } }
+    ],
+    dato: "Los <b>arrieros y baqueanos</b> cuyanos y chilenos fueron fundamentales: sabían dónde había agua, pasto y caminos seguros para las mulas."
+  },
+  {
+    id: "ganado", titulo: "El ganado en pie",
+    cond: (E) => (E.veces.ganado || 0) < 2, repetible: true,
+    texto: "El ejército lleva reses vivas que caminan con la columna. Los encargados preguntan qué hacer con ellas.",
+    opciones: [
+      { t: "Faenar algunas reses y preparar charqui", r: () => ({ texto: "Se prepara carne seca para los próximos días. Se pierde algo de tiempo, pero los víveres aumentan.", c: { viveres: 3, km: -4 } }) },
+      { t: "Repartir carne fresca a la tropa hoy", r: () => ({ texto: "¡Un banquete en la montaña! Los soldados recuperan fuerzas y ánimo.", c: { viveres: 1, moral: 7 } }) }
+    ],
+    dato: "La comida del ejército era sencilla: <b>charqui</b> (carne seca y salada), <b>harina tostada</b>, galletas y ganado en pie que se faenaba en el camino."
+  },
+  {
+    id: "desercion", titulo: "Amenaza de deserción",
+    cond: (E) => E.moral < 55, repetible: true,
+    texto: "Algunos soldados, agotados y con hambre, hablan de volver a Mendoza. El descontento se extiende por el campamento.",
+    opciones: [
+      { t: "Pedir a O'Higgins que hable a la tropa", r: () => E.moral > 30
+        ? { texto: "O'Higgins recuerda a los chilenos que van a liberar su patria. Los soldados lo aclaman.", c: { moral: 12, soldados: -rnd(5, 20) } }
+        : { texto: "Ni las palabras de O'Higgins bastan. Un grupo deserta durante la noche.", c: { moral: 4, soldados: -rnd(60, 120) } } },
+      { t: "Repartir raciones dobles esta noche", r: () => ({ texto: "Con el estómago lleno, el ánimo mejora bastante.", c: { viveres: -2, moral: 12 } }) }
+    ],
+    dato: "El Ejército de los Andes reunía a soldados de las Provincias Unidas del Río de la Plata (hoy Argentina) y a patriotas chilenos exiliados. <b>Bernardo O'Higgins</b> mandaba una de sus divisiones."
+  },
+  {
+    id: "rio", titulo: "Río de deshielo",
+    cond: (E, alt) => alt < 3600,
+    texto: "Un río crecido por el deshielo cruza el camino. El agua corre helada y con mucha fuerza.",
+    opciones: [
+      { t: "Buscar un vado más seguro río arriba", r: () => ({ texto: "Tras un rodeo encuentran un buen vado y todos cruzan sin problemas.", c: { km: -3 } }) },
+      { t: "Cruzar aquí mismo", r: () => ({ texto: "La corriente arrastra a varias mulas con su carga.", c: { mulas: -rnd(60, 150), viveres: -1 } }) }
+    ],
+    dato: "En verano, el sol derrite la nieve de la cordillera y los ríos crecen mucho, sobre todo por la tarde. Cruzarlos era uno de los mayores peligros."
+  },
+  {
+    id: "chasqui", titulo: "Un chasqui de Las Heras",
+    cond: (E) => E.km > 90,
+    texto: "Llega un <b>chasqui</b> (mensajero) de la columna del coronel <b>Juan Gregorio de Las Heras</b>, que cruza por el camino de Uspallata con la artillería.",
+    opciones: [
+      { t: "Ordenarle que apure la marcha", r: () => { E.lasHeras = clamp(E.lasHeras + 10, 0, 100); return { texto: "Las Heras acelera el paso. Su columna llegará antes al punto de reunión.", c: { moral: 1 } }; } },
+      { t: "Confirmar el plan original", r: () => ({ texto: "Todo marcha según lo planeado. La noticia tranquiliza a la tropa.", c: { moral: 4 } }) }
+    ],
+    dato: "La <b>artillería</b> cruzó por Uspallata, el camino más directo, con la columna de Las Heras. El fraile <b>Luis Beltrán</b> dirigió el arsenal de Mendoza, donde se fabricaron armas, municiones e incluso cañones, y diseñó la forma de transportarlos por la montaña."
+  }
+];
+
+// Eventos fijos que ocurren al llegar a cierto kilómetro
+const EVENTOS_FIJOS = [
+  {
+    id: "achupallas", km: 228, titulo: "Avanzada realista en Achupallas",
+    texto: "La vanguardia de <b>Soler</b> descubre una pequeña avanzada realista que vigila el paso. Si escapan, avisarán a Santiago.",
+    opciones: [
+      { t: "¡Atacar la avanzada!", r: () => ({ texto: "Los patriotas sorprenden a los realistas y los obligan a retirarse. ¡Primer triunfo en suelo chileno!", c: { soldados: -rnd(5, 15), moral: 10 }, bono: "achupallas" }) },
+      { t: "Evitarlos y seguir en silencio", r: () => ({ texto: "Pasan sin combatir, pero los realistas logran dar la alarma.", c: { moral: -3 }, bono: "alerta" }) }
+    ],
+    dato: "El <b>Combate de Achupallas</b> (4 de febrero de 1817) fue uno de los primeros choques del Ejército de los Andes en territorio chileno."
+  },
+  {
+    id: "coimas", km: 268, titulo: "Las Coimas",
+    texto: "Cerca de Putaendo aparece un destacamento de caballería realista. Los <b>Granaderos a Caballo</b> de <b>Mariano Necochea</b> esperan la orden.",
+    opciones: [
+      { t: "Cargar con los granaderos", r: () => ({ texto: "Los granaderos cargan con sable en mano y dispersan al enemigo. ¡El camino al Aconcagua queda abierto!", c: { soldados: -rnd(5, 12), moral: 8 }, bono: "coimas" }) },
+      { t: "Mantener la posición", r: () => ({ texto: "Los realistas se retiran por su cuenta e informan de la llegada del ejército.", c: { moral: -2 }, bono: "alerta" }) }
+    ],
+    dato: "En el <b>Combate de Las Coimas</b> (7 de febrero de 1817), los Granaderos a Caballo de Necochea derrotaron a la caballería realista y aseguraron el valle del Aconcagua."
+  }
+];
+
+/* ============================================================
+   Modal
+   ============================================================ */
+function abrirModal(html) { $("#modalCont").innerHTML = html; $("#modal").classList.add("abierto"); }
+function cerrarModal() { $("#modal").classList.remove("abierto"); }
+
+function mostrarEvento(ev, alTerminar) {
+  E.vistos.add(ev.id); E.ultimo = ev.id; E.veces[ev.id] = (E.veces[ev.id] || 0) + 1;
+  abrirModal(`
+    <h2>${ev.titulo}</h2>
+    <div class="texto">${ev.texto}</div>
+    <div class="botones">${ev.opciones.map((o, i) => `<button data-i="${i}">${o.t}</button>`).join("")}</div>`);
+  $("#modalCont").querySelectorAll("button[data-i]").forEach(b => b.onclick = () => {
+    const res = ev.opciones[+b.dataset.i].r();
+    let chips = aplicarCambios(res.c || {});
+    chips = chips.concat(perderDias(res.dias || 0));
+    if (res.bono) E.bonos[res.bono]++;
+    if (res.bono === "alerta") chips.push(`<span class="chip menos">Los realistas están alerta</span>`);
+    if (res.bono === "zapa") chips.push(`<span class="chip mas">Realistas confundidos</span>`);
+    if (res.bono === "intel") chips.push(`<span class="chip mas">Información del enemigo</span>`);
+    agregarDiario(`<b>${ev.titulo}.</b> ${res.texto}`);
+    abrirModal(`
+      <h2>${ev.titulo}</h2>
+      <div class="texto">${res.texto}</div>
+      <div class="cambios">${chips.join("")}</div>
+      <div class="dato"><b>¿Sabías que…?</b><br>${ev.dato}</div>
+      <div class="botones"><button id="btnCont">Continuar</button></div>`);
+    $("#btnCont").onclick = () => { cerrarModal(); actualizarUI(); alTerminar(); };
+  });
+}
+
+function mostrarHito(p, alTerminar) {
+  abrirModal(`
+    <h2>${p.nombre}</h2>
+    <div class="dato" style="margin-top:0">${p.info}</div>
+    <div class="botones"><button id="btnCont">Continuar</button></div>`);
+  $("#btnCont").onclick = () => { cerrarModal(); alTerminar(); };
+}
+
+/* ============================================================
+   Ciclo del día
+   ============================================================ */
+let animando = false;
+
+function avanzarDia() {
+  if (animando || E.fin) return;
+  const ritmo = $("input[name=ritmo]:checked").value;
+  const raciones = $("input[name=raciones]:checked").value;
+  const alt = altitudEn(E.km);
+  const kmAntes = E.km;
+
+  // Avance
+  let base = { pausado: 10, normal: 16, forzado: 22 }[ritmo];
+  if (alt > 3800) base *= 0.72; else if (alt > 2600) base *= 0.86;
+  if (E.mulas < INI.mulas * 0.5) base *= 0.85;
+  if (E.moral < 30) base *= 0.85;
+  const avance = Math.max(3, Math.round(base * rand(0.85, 1.15)));
+  E.km = clamp(E.km + avance, 0, TOTAL_KM);
+
+  // Víveres
+  E.viveres -= raciones === "completas" ? 1 : 0.6;
+  let hambre = false;
+  if (E.viveres <= 0) { E.viveres = 0; hambre = true; }
+
+  // Moral
+  let dMoral = { pausado: 3, normal: 0, forzado: -6 }[ritmo];
+  dMoral += raciones === "completas" ? 0 : -4;
+  if (alt > 3500) dMoral -= 3; else if (alt > 2500) dMoral -= 1;
+  if (hambre) dMoral -= 12;
+  E.moral = clamp(E.moral + dMoral, 0, 100);
+
+  // Pérdidas
+  const altF = alt > 3500 ? 2 : alt > 2500 ? 1.4 : 1;
+  const tasaMulas = { pausado: 0.002, normal: 0.004, forzado: 0.01 }[ritmo] * altF;
+  const mPerd = Math.round(E.mulas * tasaMulas * rand(0.6, 1.4));
+  let sPerd = Math.round(({ pausado: 2, normal: 6, forzado: 14 }[ritmo]) * altF * rand(0.5, 1.5));
+  if (hambre) sPerd += rnd(40, 90);
+  E.mulas = Math.max(0, E.mulas - mPerd);
+  E.soldados = Math.max(0, E.soldados - sPerd);
+
+  // Las Heras avanza por Uspallata
+  E.lasHeras = clamp(E.lasHeras + rand(4.5, 6), 0, 100);
+
+  let txt = `Avanzamos ${avance} km a ritmo ${ritmo}. Se perdieron ${mPerd} mulas`;
+  txt += sPerd ? ` y ${sPerd} hombres.` : ".";
+  if (hambre) txt += " <b>¡No quedan víveres! El hambre debilita a la tropa.</b>";
+  agregarDiario(txt);
+  E.dia++;
+
+  // Animación del avance, luego eventos
+  animando = true;
+  $("#btnAvanzar").disabled = true;
+  vista.objetivo = E.km;
+  actualizarUI();
+  setTimeout(() => {
+    animando = false;
+    procesarCola(armarCola(kmAntes));
+  }, 1500);
+}
+
+function armarCola(kmAntes) {
+  const cola = [];
+  // Hitos del camino
+  for (const p of RUTA) {
+    if (p.km > kmAntes && p.km <= E.km && !E.hitos.has(p.km)) {
+      E.hitos.add(p.km);
+      agregarDiario(`Llegamos a <b>${p.nombre}</b>.`);
+      if (p.info) cola.push(done => mostrarHito(p, done));
+    }
+  }
+  // Eventos fijos
+  let huboFijo = false;
+  for (const ev of EVENTOS_FIJOS) {
+    if (!E.vistos.has(ev.id) && E.km >= ev.km) { cola.push(done => mostrarEvento(ev, done)); huboFijo = true; }
+  }
+  // Evento aleatorio
+  if (!huboFijo && E.km < TOTAL_KM && Math.random() < 0.6) {
+    const alt = altitudEn(E.km);
+    const pool = EVENTOS.filter(ev => (ev.repetible || !E.vistos.has(ev.id)) && ev.id !== E.ultimo && ev.cond(E, alt));
+    if (pool.length) {
+      const ev = pool[Math.floor(Math.random() * pool.length)];
+      cola.push(done => mostrarEvento(ev, done));
+    }
+  }
+  return cola;
+}
+
+function procesarCola(cola) {
+  if (revisarDerrota()) return;
+  if (cola.length) { cola.shift()(() => procesarCola(cola)); return; }
+  actualizarUI();
+  if (E.km >= TOTAL_KM) { llegarAChile(); return; }
+  $("#btnAvanzar").disabled = false;
+}
+
+function revisarDerrota() {
+  let motivo = null;
+  if (E.soldados < 1000) motivo = { t: "El ejército quedó diezmado", d: "Quedan muy pocos soldados para enfrentar a los realistas. San Martín ordena la retirada a Mendoza." };
+  else if (E.moral <= 0) motivo = { t: "Deserción masiva", d: "La moral se derrumbó. Cientos de soldados abandonan la columna y la expedición fracasa." };
+  else if (E.dia > 32) motivo = { t: "Demasiado tarde", d: "El cruce tardó demasiado. Marcó del Pont descubrió el plan y concentró sus tropas en los pasos de la cordillera." };
+  if (!motivo) return false;
+  E.fin = true;
+  actualizarUI();
+  finalDerrotaCruce(motivo);
+  return true;
+}
+
+/* ============================================================
+   Interfaz
+   ============================================================ */
+function agregarDiario(html) {
+  const p = document.createElement("p");
+  p.innerHTML = `<b>${fecha(E.dia)}:</b> ${html}`;
+  $("#diario").prepend(p);
+}
+
+function barra(nombre, valor, max, texto, colorFn) {
+  const pct = clamp(valor / max * 100, 0, 100);
+  return `<div class="recurso"><div class="fila"><span>${nombre}</span><span>${texto}</span></div>
+    <div class="barra"><div style="width:${pct}%;background:${colorFn(pct)}"></div></div></div>`;
+}
+const colorSalud = p => p > 55 ? "var(--verde)" : p > 30 ? "var(--oro)" : "var(--rojo)";
+
+function actualizarUI() {
+  $("#hFecha").textContent = fecha(E.dia);
+  $("#hDia").textContent = "Día " + E.dia + " de marcha";
+  $("#hLugar").textContent = lugarEn(E.km);
+  $("#hAlt").textContent = fmt(altitudEn(E.km)) + " m";
+  $("#hKm").textContent = Math.round(E.km) + " / " + TOTAL_KM + " km";
+  $("#recursos").innerHTML =
+    barra("Soldados", E.soldados, INI.soldados, fmt(E.soldados), colorSalud) +
+    barra("Mulas", E.mulas, INI.mulas, fmt(E.mulas), colorSalud) +
+    barra("Víveres", E.viveres, INI.viveres, (Math.round(E.viveres * 10) / 10).toLocaleString("es-CL") + " días", colorSalud) +
+    barra("Moral", E.moral, 100, Math.round(E.moral) + "%", colorSalud);
+  const lh = Math.round(E.lasHeras);
+  $("#lasHeras").innerHTML = `<b>Columna de Las Heras</b> (Uspallata): ${lh >= 100 ? "¡llegó al punto de reunión!" : lh + "% del camino"}
+    <div class="barra" style="margin-top:4px"><div style="width:${lh}%;background:var(--azul-claro)"></div></div>`;
+  dibujarPerfil();
+}
+
+function dibujarPerfil() {
+  const x = km => km / TOTAL_KM * 1000;
+  const y = alt => 135 - alt / 5000 * 115;
+  let pts = RUTA.map(p => `${x(p.km)},${y(p.alt)}`).join(" ");
+  let s = `<rect x="0" y="0" width="1000" height="150" fill="#fbf6ea"/>`;
+  s += `<polygon points="0,150 ${pts} 1000,150" fill="#c9b38a"/>`;
+  s += `<polygon points="0,150 ${RUTA.filter(p => p.km <= E.km).map(p => `${x(p.km)},${y(p.alt)}`).join(" ")} ${x(E.km)},${y(altitudEn(E.km))} ${x(E.km)},150" fill="#8a6f47"/>`;
+  s += `<polyline points="${pts}" fill="none" stroke="#5a4630" stroke-width="2"/>`;
+  for (const p of RUTA) {
+    s += `<circle cx="${x(p.km)}" cy="${y(p.alt)}" r="4" fill="#fff" stroke="#5a4630" stroke-width="1.5"/>`;
+  }
+  const mx = x(E.km), my = y(altitudEn(E.km));
+  s += `<line x1="${mx}" y1="${my}" x2="${mx}" y2="${my - 26}" stroke="#2b2118" stroke-width="2"/>`;
+  s += `<rect x="${mx}" y="${my - 26}" width="18" height="6" fill="#6fa8dc"/><rect x="${mx}" y="${my - 20}" width="18" height="6" fill="#fff" stroke="#6fa8dc" stroke-width=".5"/>`;
+  s += `<text x="8" y="16" font-size="13" fill="#6b5a48">Mendoza</text><text x="992" y="16" font-size="13" fill="#6b5a48" text-anchor="end">Chile</text>`;
+  $("#perfil").innerHTML = s;
+}
+
+/* ============================================================
+   Escena animada (canvas)
+   ============================================================ */
+const cv = $("#escena"), ctx = cv.getContext("2d");
+const vista = { km: 0, objetivo: 0 };
+let copos = [];
+
+function ruido(x, seed) {
+  return Math.sin(x * 0.011 + seed) * 0.45 + Math.sin(x * 0.027 + seed * 2.3) * 0.3 +
+         Math.sin(x * 0.063 + seed * 3.7) * 0.17 + Math.sin(x * 0.13 + seed * 5.1) * 0.08;
+}
+
+function ajustarCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(cv.clientWidth * dpr);
+  cv.height = Math.round(cv.clientHeight * dpr);
+}
+window.addEventListener("resize", ajustarCanvas);
+
+function mezcla(c1, c2, t) {
+  const a = c1.match(/\w\w/g).map(h => parseInt(h, 16)), b = c2.match(/\w\w/g).map(h => parseInt(h, 16));
+  return "rgb(" + a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(",") + ")";
+}
+
+function dibujarEscena(t) {
+  const W = cv.width, H = cv.height;
+  if (!W || !H) { requestAnimationFrame(dibujarEscena); return; }
+  const s = H / 300;
+  // Movimiento suave hacia el objetivo
+  const dif = vista.objetivo - vista.km;
+  const moviendo = Math.abs(dif) > 0.05 || animando;
+  vista.km += dif * 0.04;
+  const alt = altitudEn(vista.km);
+  const f = clamp((alt - 600) / 4000, 0, 1);
+  const off = vista.km * 60;
+
+  // Cielo
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, mezcla("4a7fb5", "1e3f73", f));
+  g.addColorStop(1, mezcla("cfe3f2", "a9c4de", f));
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // Sol
+  ctx.fillStyle = "rgba(255,240,190,0.9)";
+  ctx.beginPath(); ctx.arc(W * 0.82, H * 0.17, 22 * s, 0, Math.PI * 2); ctx.fill();
+
+  // Capas de montañas
+  const capas = [
+    { par: 0.15, base: 0.62, amp: 0.25 + 0.3 * f, color: mezcla("9fb4cc", "b7c6d8", f), seed: 1, nieve: 0.75 - 0.35 * f },
+    { par: 0.4,  base: 0.72, amp: 0.18 + 0.3 * f, color: mezcla("7d8f74", "6f7684", f), seed: 7, nieve: f > 0.4 ? 0.9 - 0.4 * f : 2 },
+    { par: 0.75, base: 0.8,  amp: 0.1 + 0.15 * f, color: mezcla("8a7a52", "7a6a5a", f), seed: 13, nieve: 2 }
+  ];
+  for (const c of capas) {
+    const xs = [], ys = [];
+    for (let x = 0; x <= W + 4; x += 4) {
+      const n = (ruido((x / s) + off * c.par, c.seed) + 1) / 2;
+      xs.push(x); ys.push(H * (c.base - c.amp * n));
+    }
+    ctx.beginPath(); ctx.moveTo(0, H);
+    xs.forEach((x, i) => ctx.lineTo(x, ys[i]));
+    ctx.lineTo(W, H); ctx.closePath();
+    ctx.fillStyle = c.color; ctx.fill();
+    if (c.nieve < 1.5) {
+      // La nieve cubre las cumbres y termina en un borde irregular
+      const yN = H * (c.base - c.amp * c.nieve);
+      ctx.beginPath();
+      xs.forEach((x, i) => ctx.lineTo(x, ys[i]));
+      for (let i = xs.length - 1; i >= 0; i--) {
+        const borde = yN + Math.sin((xs[i] / s + off * c.par) * 0.21 + c.seed) * 6 * s;
+        ctx.lineTo(xs[i], Math.max(ys[i], borde));
+      }
+      ctx.closePath();
+      ctx.fillStyle = "rgba(255,255,255,0.92)"; ctx.fill();
+    }
+  }
+
+  // Suelo y sendero
+  const sueloY = x => H * 0.86 + Math.sin((x / s + off) * 0.01) * 6 * s;
+  ctx.beginPath(); ctx.moveTo(0, H);
+  for (let x = 0; x <= W + 4; x += 4) ctx.lineTo(x, sueloY(x));
+  ctx.lineTo(W, H); ctx.closePath();
+  ctx.fillStyle = alt > 3800 ? "#e8edf2" : mezcla("a08a5c", "8f8478", f); ctx.fill();
+  // Piedras que pasan
+  ctx.fillStyle = "rgba(60,45,30,0.35)";
+  for (let i = 0; i < 14; i++) {
+    const px = ((i * 137 - off * 1.0) % (W / s + 100) + (W / s + 100)) % (W / s + 100) - 50;
+    ctx.beginPath(); ctx.ellipse(px * s, sueloY(px * s) + 14 * s + (i % 3) * 5 * s, (3 + i % 4) * s, 2 * s, 0, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // La columna: soldados y mulas
+  const n = 13;
+  for (let i = 0; i < n; i++) {
+    const x = W * 0.12 + i * (W * 0.055);
+    const y = sueloY(x);
+    const fase = t / 140 + i * 1.3;
+    const paso = moviendo ? Math.sin(fase) : 0;
+    const bob = moviendo ? Math.abs(Math.sin(fase)) * 2 * s : 0;
+    if (i % 3 === 2) dibujarMula(x, y - bob, s, paso);
+    else dibujarSoldado(x, y - bob, s, paso, i === n - 1);
+  }
+
+  // Nieve
+  if (alt > 3200) {
+    while (copos.length < 120) copos.push({ x: Math.random() * W, y: Math.random() * H, v: rand(0.5, 1.6) });
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    for (const c of copos) {
+      c.y += c.v * s; c.x -= (moviendo ? 1.5 : 0.4) * s;
+      if (c.y > H) { c.y = -5; c.x = Math.random() * W; }
+      if (c.x < 0) c.x = W;
+      ctx.beginPath(); ctx.arc(c.x, c.y, 1.6 * s, 0, Math.PI * 2); ctx.fill();
+    }
+  } else copos = [];
+
+  requestAnimationFrame(dibujarEscena);
+}
+
+function dibujarSoldado(x, y, s, paso, abanderado) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  ctx.strokeStyle = "#1c1c2a"; ctx.lineWidth = 2.2; ctx.lineCap = "round";
+  // piernas
+  ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(-4 * paso, 0); ctx.moveTo(0, -14); ctx.lineTo(4 * paso, 0); ctx.stroke();
+  // cuerpo (uniforme azul)
+  ctx.fillStyle = "#1f3a68"; ctx.fillRect(-4, -28, 8, 15);
+  // poncho
+  ctx.fillStyle = "#8b2e24"; ctx.beginPath(); ctx.moveTo(-5, -27); ctx.lineTo(5, -27); ctx.lineTo(6, -19); ctx.lineTo(-6, -19); ctx.closePath(); ctx.fill();
+  // cabeza y morrión
+  ctx.fillStyle = "#e0b48a"; ctx.beginPath(); ctx.arc(0, -32, 4, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#111"; ctx.fillRect(-4, -39, 8, 5);
+  if (abanderado) {
+    ctx.strokeStyle = "#5a4630"; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(5, -10); ctx.lineTo(5, -58); ctx.stroke();
+    ctx.fillStyle = "#6fa8dc"; ctx.fillRect(5, -58, 20, 7);
+    ctx.fillStyle = "#fff"; ctx.fillRect(5, -51, 20, 7);
+  } else {
+    // fusil
+    ctx.strokeStyle = "#4a3520"; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(-3, -16); ctx.lineTo(6, -42); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function dibujarMula(x, y, s, paso) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  ctx.strokeStyle = "#4a3222"; ctx.lineWidth = 2.2; ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-9, -10); ctx.lineTo(-9 + 3 * paso, 0); ctx.moveTo(-6, -10); ctx.lineTo(-6 - 3 * paso, 0);
+  ctx.moveTo(8, -10); ctx.lineTo(8 - 3 * paso, 0); ctx.moveTo(11, -10); ctx.lineTo(11 + 3 * paso, 0);
+  ctx.stroke();
+  ctx.fillStyle = "#6b4a32"; ctx.beginPath(); ctx.ellipse(1, -14, 13, 6, 0, 0, Math.PI * 2); ctx.fill();
+  // cabeza
+  ctx.beginPath(); ctx.moveTo(11, -16); ctx.lineTo(20, -24); ctx.lineTo(23, -20); ctx.lineTo(14, -12); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(18, -24); ctx.lineTo(17, -30); ctx.lineTo(20, -25); ctx.fill();
+  // carga
+  ctx.fillStyle = "#c9a96e"; ctx.fillRect(-8, -26, 16, 9);
+  ctx.strokeStyle = "#7a5c2e"; ctx.lineWidth = 1; ctx.strokeRect(-8, -26, 16, 9);
+  ctx.restore();
+}
+
+/* ============================================================
+   Llegada y Batalla de Chacabuco
+   ============================================================ */
+let B;
+
+function llegarAChile() {
+  E.diaLlegada = E.dia;
+  let espera = 0;
+  while (E.lasHeras < 100) { perderDias(1); espera++; }
+  agregarDiario("¡La columna principal llega al valle del Aconcagua!");
+  const msgEspera = espera
+    ? `Llegaron antes que la columna de Las Heras y esperaron <b>${espera} día${espera > 1 ? "s" : ""}</b> para reunir al ejército.`
+    : `La columna de <b>Las Heras</b> ya los esperaba con la artillería.`;
+  abrirModal(`
+    <h2>¡Llegaron a Chile!</h2>
+    <div class="texto">Después de ${E.diaLlegada - 1} días de marcha, la columna principal baja al valle del Aconcagua. ${msgEspera}</div>
+    <div class="dato"><b>¿Sabías que…?</b><br>En la realidad, el cruce de la columna principal duró cerca de <b>tres semanas</b>. El ejército completo sumaba unos <b>5.000 hombres</b>, entre combatientes y auxiliares.</div>
+    <div class="botones"><button id="btnCont">Prepararse para la batalla</button></div>`);
+  $("#btnCont").onclick = () => { cerrarModal(); iniciarBatalla(); };
+}
+
+function iniciarBatalla() {
+  E.fin = true;
+  const retraso = Math.max(0, E.dia - 24);
+  const pat = E.soldados * (0.55 + E.moral / 220) + 1000;
+  let rea = 2000 + retraso * 180 + E.bonos.alerta * 250 - E.bonos.zapa * 350 - E.bonos.achupallas * 60 - E.bonos.coimas * 60;
+  rea = Math.max(1200, rea);
+  B = { pat, rea, retraso };
+
+  const notas = [];
+  if (E.bonos.zapa) notas.push("✔ La guerra de zapa mantuvo a parte de los realistas lejos, en el sur.");
+  if (E.bonos.intel) notas.push("✔ Los espías de Manuel Rodríguez informaron las posiciones enemigas.");
+  if (E.bonos.achupallas || E.bonos.coimas) notas.push("✔ Las victorias en el camino debilitaron las avanzadas realistas.");
+  if (E.bonos.alerta) notas.push("✘ Los realistas fueron alertados y reunieron más tropas.");
+  if (retraso) notas.push(`✘ El retraso de ${retraso} día${retraso > 1 ? "s" : ""} permitió llegar refuerzos realistas desde Santiago.`);
+  if (E.moral < 40) notas.push("✘ La moral baja debilita a la tropa.");
+
+  mostrarPantalla("batalla");
+  $("#batallaCont").innerHTML = `
+    <h1>Batalla de Chacabuco</h1>
+    <p class="centro serif">12 de febrero de 1817 · Cuesta de Chacabuco, al norte de Santiago</p>
+    <div class="caja">
+      <p>El ejército realista, al mando del brigadier <b>Rafael Maroto</b>, espera en la cuesta de Chacabuco para cerrar el paso a Santiago.
+      San Martín divide sus fuerzas en dos divisiones: una al mando de <b>Bernardo O'Higgins</b> y otra al mando de <b>Miguel Estanislao Soler</b>.</p>
+      <div class="fuerzas">
+        <div class="lado pat"><div class="num">${fmt(pat)}</div>Fuerza patriota<br><small>(incluye la columna de Las Heras)</small></div>
+        <div class="lado rea"><div class="num">${fmt(rea)}</div>Fuerza realista</div>
+      </div>
+      ${notas.length ? `<p style="line-height:1.7">${notas.join("<br>")}</p>` : ""}
+    </div>
+    <div class="caja">
+      <h2>Decisión 1: el plan de ataque</h2>
+      <div class="botones" style="display:flex;flex-direction:column;gap:8px">
+        <button id="plan1">Ataque en pinza: O'Higgins avanza por el frente y Soler rodea al enemigo por el flanco</button>
+        <button id="plan2">Ataque frontal con todo el ejército unido</button>
+      </div>
+    </div>`;
+  $("#plan1").onclick = decisionCarga;
+  $("#plan2").onclick = () => resolverBatalla(0.8, "Todo el ejército carga de frente contra las posiciones realistas en la cuesta. El enemigo, bien ubicado en altura, resiste con fuerza.");
+}
+
+function decisionCarga() {
+  $("#batallaCont").innerHTML = `
+    <h1>Batalla de Chacabuco</h1>
+    <div class="caja">
+      <h2>Decisión 2: el momento crítico</h2>
+      <p>La división de <b>O'Higgins</b> llega primero frente a los realistas. Maroto despliega sus tropas y comienza el fuego.
+      La división de <b>Soler</b> todavía no termina su rodeo por el flanco, que es un camino más largo.</p>
+      <p>O'Higgins está impaciente. ¿Qué ordenas?</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button id="carga1">¡Cargar ahora con la división de O'Higgins!</button>
+        <button id="carga2">Esperar a que Soler complete el flanqueo</button>
+      </div>
+    </div>`;
+  $("#carga1").onclick = () => {
+    const llega = Math.random() < 0.75 + (E.bonos.intel ? 0.15 : 0);
+    if (llega) resolverBatalla(1.3, "O'Higgins carga con valentía. Justo cuando la lucha se pone difícil, ¡aparece Soler por el flanco! Los realistas quedan atrapados entre las dos divisiones.");
+    else resolverBatalla(0.7, "O'Higgins carga, pero Soler se retrasa en el camino. La división de O'Higgins debe resistir sola contra todo el ejército realista.");
+  };
+  $("#carga2").onclick = () => resolverBatalla(1.0, "Esperas a Soler. El ataque coordinado es ordenado, pero los realistas aprovechan el tiempo para reforzar sus posiciones.");
+}
+
+function resolverBatalla(mult, relato) {
+  const r = (B.pat * mult) / B.rea;
+  const p = clamp(0.5 + (r - 1.9) * 0.6, 0.05, 0.95);
+  const victoria = Math.random() < p;
+  const pctPat = clamp(50 + (victoria ? 1 : -1) * (15 + Math.random() * 25), 5, 95);
+  $("#batallaCont").innerHTML = `
+    <h1>Batalla de Chacabuco</h1>
+    <div class="caja">
+      <p class="texto">${relato}</p>
+      <div class="choque"><div id="bPat" style="width:50%;background:var(--azul)"></div><div id="bRea" style="width:50%;background:var(--rojo)"></div></div>
+      <p class="nota centro">Probabilidad estimada de victoria: ${Math.round(p * 100)}%</p>
+      <div id="bRes" class="centro" style="min-height:60px"></div>
+    </div>`;
+  setTimeout(() => { $("#bPat").style.width = pctPat + "%"; $("#bRea").style.width = (100 - pctPat) + "%"; }, 100);
+  setTimeout(() => {
+    $("#bRes").innerHTML = `<h2 style="color:${victoria ? "var(--verde)" : "var(--rojo)"}">${victoria ? "¡VICTORIA PATRIOTA!" : "Derrota patriota"}</h2>
+      <button id="btnFin">Ver resultados</button>`;
+    $("#btnFin").onclick = () => finalBatalla(victoria);
+  }, 1900);
+}
+
+/* ============================================================
+   Finales y puntaje
+   ============================================================ */
+let puntajeBase = 0;
+
+function statsHTML() {
+  return `<div class="stats">
+    <div class="stat"><div class="v">${E.diaLlegada ? E.diaLlegada - 1 : E.dia - 1}</div><div class="k">días de marcha</div></div>
+    <div class="stat"><div class="v">${fmt(E.soldados)}</div><div class="k">soldados (de ${fmt(INI.soldados)})</div></div>
+    <div class="stat"><div class="v">${fmt(E.mulas)}</div><div class="k">mulas (de ${fmt(INI.mulas)})</div></div>
+    <div class="stat"><div class="v">${Math.round(E.moral)}%</div><div class="k">moral final</div></div>
+  </div>`;
+}
+
+function calcularPuntaje(victoria) {
+  let pts = E.soldados / 2 + E.mulas / 10 + E.moral * 5 + E.km * 2;
+  if (E.diaLlegada) pts += Math.max(0, 26 - E.diaLlegada) * 50;
+  if (victoria) pts += 1500;
+  return Math.round(pts);
+}
+
+function finalBatalla(victoria) {
+  puntajeBase = calcularPuntaje(victoria);
+  mostrarPantalla("final");
+  $("#finalCont").innerHTML = `
+    <h1>${victoria ? "¡Chile vuelve a ser libre!" : "La batalla se perdió…"}</h1>
+    <div class="caja">
+      ${victoria
+        ? `<p>¡Felicitaciones! Al igual que en la historia real, el Ejército de los Andes derrotó a los realistas en Chacabuco.</p>`
+        : `<p>Esta vez la suerte no estuvo de tu lado. Pero en la <b>historia real</b>, ¡los patriotas ganaron!</p>`}
+      <p><b>Lo que pasó en la historia real:</b> El 12 de febrero de 1817, O'Higgins atacó antes de que Soler terminara su rodeo.
+      La llegada de Soler por el flanco decidió la batalla y fue una gran <b>victoria patriota</b>. El 14 de febrero el ejército entró en Santiago,
+      Marcó del Pont fue capturado mientras huía y <b>Bernardo O'Higgins fue nombrado Director Supremo de Chile</b>.</p>
+      <p>Exactamente un año después, el <b>12 de febrero de 1818</b>, se proclamó la <b>Independencia de Chile</b>, que se consolidó con la victoria en la
+      <b>Batalla de Maipú</b> (5 de abril de 1818).</p>
+    </div>
+    ${statsHTML()}
+    <p class="centro">Puntaje de la campaña: <b>${fmt(puntajeBase)}</b></p>
+    <p class="centro"><button class="btn-grande" id="btnQuiz">Desafío final: preguntas de historia ▸</button></p>`;
+  $("#btnQuiz").onclick = iniciarQuiz;
+}
+
+function finalDerrotaCruce(m) {
+  puntajeBase = calcularPuntaje(false);
+  setTimeout(() => {
+    mostrarPantalla("final");
+    $("#finalCont").innerHTML = `
+      <h1>${m.t}</h1>
+      <div class="caja">
+        <p>${m.d}</p>
+        <p><b>Lo que pasó en la historia real:</b> El Ejército de los Andes logró cruzar la cordillera en unas tres semanas, coordinando varias columnas
+        por distintos pasos. El 12 de febrero de 1817 venció en la <b>Batalla de Chacabuco</b> y poco después O'Higgins fue nombrado Director Supremo de Chile.</p>
+      </div>
+      ${statsHTML()}
+      <p class="centro">Puntaje de la campaña: <b>${fmt(puntajeBase)}</b></p>
+      <p class="centro" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="sec" id="btnOtra">Intentar de nuevo</button>
+        <button id="btnQuiz">Desafío final: preguntas ▸</button></p>`;
+    $("#btnQuiz").onclick = iniciarQuiz;
+    $("#btnOtra").onclick = empezar;
+  }, 400);
+}
+
+/* ============================================================
+   Quiz
+   ============================================================ */
+const PREGUNTAS = [
+  { p: "¿Quién fue el general a cargo del Ejército de los Andes?", o: ["José de San Martín", "José Miguel Carrera", "Manuel Rodríguez", "Ramón Freire"], c: 0 },
+  { p: "¿En qué año cruzó la cordillera el Ejército de los Andes?", o: ["1810", "1814", "1817", "1823"], c: 2 },
+  { p: "¿Qué batalla se libró el 12 de febrero de 1817?", o: ["Rancagua", "Chacabuco", "Maipú", "Yungay"], c: 1 },
+  { p: "¿Dónde se entrenó el Ejército de los Andes?", o: ["En Valparaíso", "En Lima", "En El Plumerillo (Mendoza)", "En Concepción"], c: 2 },
+  { p: "¿Qué fue la \"guerra de zapa\"?", o: ["Una batalla naval", "Espionaje, rumores y guerrillas para confundir a los realistas", "Una rebelión de los mineros", "El nombre del cruce de la cordillera"], c: 1 },
+  { p: "¿Quién era el gobernador realista de Chile durante la Reconquista?", o: ["Casimiro Marcó del Pont", "Ambrosio O'Higgins", "Mateo de Toro y Zambrano", "Diego Portales"], c: 0 },
+  { p: "¿Por qué paso cruzó la columna principal, con San Martín y O'Higgins?", o: ["Paso de Uspallata", "Paso de Los Patos", "Paso del Planchón", "Paso de Come-Caballos"], c: 1 },
+  { p: "¿Qué cargo asumió Bernardo O'Higgins después de Chacabuco?", o: ["Presidente de la República", "Gobernador de Mendoza", "Director Supremo", "Rey de Chile"], c: 2 },
+  { p: "¿Qué es el \"soroche\"?", o: ["Un tipo de comida", "El mal de altura", "Un arma de la época", "Un río de la cordillera"], c: 1 },
+  { p: "¿Qué alimento, según la tradición, llevaban contra el soroche?", o: ["Ajo y cebolla", "Chocolate", "Papas fritas", "Naranjas"], c: 0 },
+  { p: "¿Qué hecho llevó a los patriotas chilenos al exilio en Mendoza?", o: ["La Batalla de Maipú", "El Desastre de Rancagua (1814)", "El Combate Naval de Iquique", "La Primera Junta de Gobierno"], c: 1 },
+  { p: "¿Qué era el charqui?", o: ["Un tipo de mula", "Un abrigo de lana", "Carne seca y salada", "Un instrumento musical"], c: 2 },
+  { p: "¿Quién memorizó los caminos de la cordillera y luego dibujó los mapas del cruce?", o: ["Fray Luis Beltrán", "José Antonio Álvarez Condarco", "Mariano Necochea", "Rafael Maroto"], c: 1 },
+  { p: "¿Cuándo se proclamó la Independencia de Chile?", o: ["18 de septiembre de 1810", "12 de febrero de 1818", "5 de abril de 1818", "21 de mayo de 1879"], c: 1 }
+];
+let Q;
+
+function iniciarQuiz() {
+  const mezcladas = PREGUNTAS.slice().sort(() => Math.random() - 0.5).slice(0, 6);
+  Q = { lista: mezcladas, i: 0, bien: 0 };
+  mostrarPantalla("quiz");
+  mostrarPregunta();
+}
+
+function mostrarPregunta() {
+  const q = Q.lista[Q.i];
+  $("#quizCont").innerHTML = `
+    <h1>Desafío final</h1>
+    <p class="progreso-quiz">Pregunta ${Q.i + 1} de ${Q.lista.length} · Correctas: ${Q.bien}</p>
+    <div class="caja">
+      <h2 class="serif" style="color:var(--tinta)">${q.p}</h2>
+      ${q.o.map((o, i) => `<button class="quiz-op" data-i="${i}">${String.fromCharCode(65 + i)}) ${o}</button>`).join("")}
+      <div id="qSig" style="margin-top:12px;text-align:right"></div>
+    </div>`;
+  document.querySelectorAll(".quiz-op").forEach(b => b.onclick = () => {
+    const i = +b.dataset.i;
+    document.querySelectorAll(".quiz-op").forEach(x => { x.disabled = true; if (+x.dataset.i === q.c) x.classList.add("ok"); });
+    if (i === q.c) Q.bien++; else b.classList.add("mal");
+    const ultima = Q.i === Q.lista.length - 1;
+    $("#qSig").innerHTML = `<button id="btnSig">${ultima ? "Ver resultado final" : "Siguiente ▸"}</button>`;
+    $("#btnSig").onclick = () => { if (ultima) resultadoFinal(); else { Q.i++; mostrarPregunta(); } };
+  });
+}
+
+function resultadoFinal() {
+  const total = puntajeBase + Q.bien * 200;
+  const rangos = [[1500, "Recluta"], [2500, "Sargento"], [3500, "Capitán"], [4500, "Coronel"], [Infinity, "General del Ejército de los Andes"]];
+  const rango = rangos.find(r => total < r[0])[1];
+  $("#quizCont").innerHTML = `
+    <h1>Resultado final</h1>
+    <div class="caja centro">
+      <p>Respondiste correctamente <b>${Q.bien} de ${Q.lista.length}</b> preguntas.</p>
+      <div class="stats">
+        <div class="stat"><div class="v">${fmt(puntajeBase)}</div><div class="k">puntaje de campaña</div></div>
+        <div class="stat"><div class="v">${fmt(Q.bien * 200)}</div><div class="k">puntaje del desafío</div></div>
+        <div class="stat"><div class="v">${fmt(total)}</div><div class="k">PUNTAJE TOTAL</div></div>
+      </div>
+      <p>Tu rango:</p>
+      <div class="rango">${rango}</div>
+      <p><button class="btn-grande" id="btnReini">Jugar de nuevo</button></p>
+    </div>`;
+  $("#btnReini").onclick = empezar;
+}
+
+/* ============================================================
+   Inicio
+   ============================================================ */
+function empezar() {
+  E = nuevoEstado();
+  vista.km = 0; vista.objetivo = 0;
+  $("#diario").innerHTML = "";
+  $("#r2").checked = true; $("#c1").checked = true;
+  $("#btnAvanzar").disabled = false;
+  mostrarPantalla("juego");
+  ajustarCanvas();
+  agregarDiario("El Ejército de los Andes sale del campamento de El Plumerillo. ¡Comienza el cruce!");
+  actualizarUI();
+}
+
+$("#btnEmpezar").onclick = empezar;
+$("#btnAvanzar").onclick = avanzarDia;
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && $("#juego").classList.contains("activa") && !$("#modal").classList.contains("abierto")) {
+    e.preventDefault(); avanzarDia();
+  }
+});
+requestAnimationFrame(dibujarEscena);
+</script>
+</body>
+</html>

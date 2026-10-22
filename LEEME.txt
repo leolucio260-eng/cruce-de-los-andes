@@ -1,0 +1,24 @@
+EL CRUCE DE LOS ANDES (1817) - Juego educativo de historia de Chile
+====================================================================
+
+COMO ABRIR EL JUEGO
+-------------------
+1. Copia el archivo "cruce-de-los-andes.html" a un pendrive o al computador.
+2. Haz doble clic en el archivo. Se abrira en el navegador
+   (Chrome, Edge o Firefox).
+3. No necesita internet ni instalar nada. Funciona en Windows, Linux y Mac.
+
+Si al hacer doble clic se abre otro programa: clic derecho sobre el archivo
+-> "Abrir con" -> elegir Chrome, Edge o Firefox.
+
+COMO SE JUEGA
+-------------
+- Diriges la columna principal del Ejercito de los Andes, que cruza
+  la cordillera por el Paso de Los Patos.
+- Cada dia eliges el ritmo de marcha y las raciones, y presionas "Avanzar"
+  (o la tecla Espacio).
+- Cuida a tus soldados, mulas, viveres y la moral de la tropa.
+- Toma decisiones en los eventos del camino. Cada evento trae un dato
+  historico ("Sabias que...").
+- Al llegar a Chile se libra la Batalla de Chacabuco (12 de febrero de 1817).
+- Al final hay un desafio de preguntas de historia que suma puntaje.
